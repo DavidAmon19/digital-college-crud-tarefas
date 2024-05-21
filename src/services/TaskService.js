@@ -1,28 +1,30 @@
 const TaskRepository = require('../repositories/TaskRepository');
 
-const createTask = async (user, taskData) => {
-  taskData.userId = user.id;
-  return TaskRepository.createTask(taskData);
-};
-
-const getTasks = async (user) => {
-  return TaskRepository.getTasks(user.id);
-};
-
-const updateTask = async (user, id, taskData) => {
-  const task = await TaskRepository.getTaskById(id);
-  if (task.userId !== user.id && user.role !== 'admin') {
-    throw new Error('Not authorized');
+class TaskService {
+  async createTask(user, taskData) {
+    taskData.userId = user.id;
+    return TaskRepository.createTask(taskData);
   }
-  return TaskRepository.updateTask(id, taskData);
-};
 
-const deleteTask = async (user, id) => {
-  const task = await TaskRepository.getTaskById(id);
-  if (task.userId !== user.id && user.role !== 'admin') {
-    throw new Error('Not authorized');
+  async getTasks(user) {
+    return TaskRepository.getTasks(user.id);
   }
-  return TaskRepository.deleteTask(id);
-};
 
-module.exports = { createTask, getTasks, updateTask, deleteTask };
+  async updateTask(user, id, taskData) {
+    const task = await TaskRepository.getTaskById(id);
+    if (task.userId !== user.id && user.role !== 'admin') {
+      throw new Error('Not authorized');
+    }
+    return TaskRepository.updateTask(id, taskData);
+  }
+
+  async deleteTask(user, id) {
+    const task = await TaskRepository.getTaskById(id);
+    if (task.userId !== user.id && user.role !== 'admin') {
+      throw new Error('Not authorized');
+    }
+    return TaskRepository.deleteTask(id);
+  }
+}
+
+module.exports = new TaskService();
